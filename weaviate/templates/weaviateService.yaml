@@ -11,15 +11,22 @@ metadata:
   {{- with .Values.service.annotations }}
   annotations: {{ toYaml . | nindent 4 }}
   {{- end }}
+  annotations:
+    prometheus.io/scrape: "true"
+    prometheus.io/port: "2112"
 spec:
   type: {{ .Values.service.type }}
   selector:
     app: weaviate
   ports:
-    {{- range .Values.service.ports }}
-    - {{ toYaml . | indent 6 | trim }}
+    - name: http
+      port: 8080
       targetPort: 8080
-    {{- end }}
+      protocol: TCP
+    - name: metrics
+      port: 2112
+      targetPort: 2112
+      protocol: TCP
 {{ if eq .Values.service.type "ClusterIP" -}}
   {{ if .Values.service.clusterIP }}
   clusterIP: {{ .Values.service.clusterIP }}

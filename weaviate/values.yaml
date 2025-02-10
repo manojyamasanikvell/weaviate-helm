@@ -133,8 +133,12 @@ service:
   ports:
     - name: http
       protocol: TCP
-      port: 80
-      # Target port is going to be the same for every port
+      port: 8080
+      targetPort: 8080
+    - name: metrics
+      protocol: TCP
+      port: 2112
+      targetPort: 2112
   type: LoadBalancer
   loadBalancerSourceRanges: []
   # optionally set cluster IP if you want to set a static IP
@@ -165,7 +169,7 @@ grpcService:
 # Make sure to set the following prometheus values if deploying observability with the kube-prometheus-stack helm chart:
 # - prometheus.prometheusSpec.serviceMonitorSelectorNilUsesHelmValues: false
 serviceMonitor:
-  enabled: false
+  enabled: true
   interval: 30s
   scrapeTimeout: 10s
 
@@ -242,9 +246,9 @@ authentication:
   #   # one user per API Key, i.e. length(apikey.allowed_keys) == length(apikey.users) OR
   #   # length(apikey.users) == 1
   #   # NOTE: Make sure the lister Users are added to the Authorization as well.
-  #   users:
-  #     - api-key-user-readOnly
-  #     - api-key-user-admin
+  #   # users:
+  #   #   - api-key-user-readOnly
+  #   #   - api-key-user-admin
   oidc:
     enabled: false
     # issuer: ''
@@ -325,7 +329,7 @@ env:
   PROMETHEUS_MONITORING_GROUP: false
 
   # Set a MEM limit for the Weaviate Pod so it can help you both increase GC-related
-  # performance as well as avoid GC-related out-of-memory (“OOM”) situations
+  # performance as well as avoid GC-related out-of-memory ("OOM") situations
   # GOMEMLIMIT: 6GiB
 
   # Maximum results Weaviate can query with/without pagination
@@ -1995,3 +1999,26 @@ affinity:
 ##
 priorityClassName: ""
 globalPriorityClassName: ""
+
+
+
+prometheus:
+  image:
+    repository: prom/prometheus
+    tag: v2.36.2
+  storage:
+    size: 1Gi
+
+grafana:
+  image:
+    repository: grafana/grafana-oss
+    tag: 10.2.3
+  storage:
+    size: 1Gi
+  resources:
+    limits:
+      cpu: "1"
+      memory: "1Gi"
+    requests:
+      cpu: "200m"
+      memory: "256Mi" 

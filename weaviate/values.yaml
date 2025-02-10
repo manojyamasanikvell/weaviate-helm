@@ -122,8 +122,8 @@ clusterDomain: cluster.local.
 # storage.fullnameOverride field set, then the default pvc will not be
 # created, instead the one defined in fullnameOverride will be used
 storage:
-  size: 32Gi
-  storageClassName: ""
+  size: 1Gi
+  storageClassName: "standard"
 
 # The service controls how weaviate is exposed to the outside world. If you
 # don't want a public load balancer, you can also choose 'ClusterIP' to make
@@ -321,7 +321,7 @@ env:
   GOGC: 100
 
   # Expose metrics on port 2112 for Prometheus to scrape
-  PROMETHEUS_MONITORING_ENABLED: false
+  PROMETHEUS_MONITORING_ENABLED: true
   PROMETHEUS_MONITORING_GROUP: false
 
   # Set a MEM limit for the Weaviate Pod so it can help you both increase GC-related
@@ -334,7 +334,7 @@ env:
   QUERY_MAXIMUM_RESULTS: 100000
 
   # whether to enable vector dimensions tracking metric
-  TRACK_VECTOR_DIMENSIONS: false
+  TRACK_VECTOR_DIMENSIONS: true
 
   # whether to re-index/-compute the vector dimensions metric (needed if upgrading from weaviate < v1.16.0)
   REINDEX_VECTOR_DIMENSIONS_AT_STARTUP: false
@@ -1964,6 +1964,8 @@ custom_config_map:
 
 # Pass any annotations to Weaviate pods
 annotations:
+  prometheus.io/scrape: "true"
+  prometheus.io/port: "2112"
 
 extraVolumeMounts:
 
